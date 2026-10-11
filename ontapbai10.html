@@ -1,0 +1,770 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Bứt Phá Hóa 10 • Quy Tắc Octet Quizz</title>
+  <!-- Google Fonts: Plus Jakarta Sans & Space Grotesk -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;700;800;900&family=Space+Grotesk:wght@700&display=swap" rel="stylesheet">
+  <!-- Canvas Confetti CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+  <style>
+    :root {
+      --bg: #faf5ff;
+      --card-bg: #ffffff;
+      --border: #1e1b4b;
+      --shadow: 4px 4px 0px #1e1b4b;
+      --shadow-hover: 6px 6px 0px #1e1b4b;
+      --pink: #ff70a6;
+      --orange: #ff9770;
+      --yellow: #ffd670;
+      --green: #70d6ff;
+      --lime: #80ed99;
+      --purple: #c77dff;
+      --correct: #80ed99;
+      --wrong: #ff70a6;
+      --text: #1e1b4b;
+      --radius: 16px;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+    }
+
+    body {
+      background-color: var(--bg);
+      background-image: 
+        radial-gradient(#c77dff33 1.5px, transparent 1.5px),
+        radial-gradient(#ffd67044 1.5px, var(--bg) 1.5px);
+      background-size: 30px 30px;
+      background-position: 0 0, 15px 15px;
+      color: var(--text);
+      min-height: 100vh;
+      padding: 24px 16px 80px;
+    }
+
+    .container {
+      max-width: 860px;
+      margin: 0 auto;
+    }
+
+    /* HEADER */
+    header {
+      text-align: center;
+      margin-bottom: 28px;
+    }
+
+    .badge-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: var(--yellow);
+      border: 2.5px solid var(--border);
+      box-shadow: 3px 3px 0 var(--border);
+      border-radius: 999px;
+      padding: 6px 16px;
+      font-weight: 800;
+      font-size: 0.85rem;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 14px;
+    }
+
+    h1 {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: clamp(1.9rem, 5vw, 2.8rem);
+      font-weight: 900;
+      line-height: 1.15;
+      color: var(--text);
+      margin-bottom: 10px;
+    }
+
+    h1 span {
+    background: linear-gradient(120deg, var(--pink), var(--purple));
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    }
+
+    .subtitle {
+      font-size: 1.05rem;
+      font-weight: 600;
+      color: #4b5563;
+    }
+
+    /* STICKY DASHBOARD */
+    .dashboard {
+      background: var(--card-bg);
+      border: 3px solid var(--border);
+      box-shadow: var(--shadow);
+      border-radius: var(--radius);
+      padding: 18px 22px;
+      margin-bottom: 24px;
+      position: sticky;
+      top: 16px;
+      z-index: 50;
+      backdrop-filter: blur(10px);
+    }
+
+    .dash-stats {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+
+    .stat-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-weight: 800;
+      font-size: 0.95rem;
+    }
+
+    .stat-pill {
+      background: #f1f5f9;
+      border: 2px solid var(--border);
+      padding: 4px 10px;
+      border-radius: 8px;
+      box-shadow: 2px 2px 0 var(--border);
+    }
+
+    .stat-pill.score {
+      background: var(--lime);
+    }
+
+    .progress-bar-container {
+      width: 100%;
+      height: 14px;
+      background: #f1f5f9;
+      border: 2.5px solid var(--border);
+      border-radius: 999px;
+      overflow: hidden;
+    }
+
+    .progress-bar-fill {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, var(--yellow), var(--pink), var(--purple));
+      transition: width 0.3s ease;
+    }
+
+    /* FILTER BUTTONS */
+    .filters {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 24px;
+      justify-content: center;
+    }
+
+    .filter-btn {
+      background: #fff;
+      border: 2.5px solid var(--border);
+      box-shadow: 3px 3px 0 var(--border);
+      border-radius: 12px;
+      padding: 8px 14px;
+      font-weight: 800;
+      font-size: 0.85rem;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .filter-btn:hover {
+      transform: translate(-2px, -2px);
+      box-shadow: 5px 5px 0 var(--border);
+    }
+
+    .filter-btn:active {
+      transform: translate(2px, 2px);
+      box-shadow: 1px 1px 0 var(--border);
+    }
+
+    .filter-btn.active {
+      background: var(--purple);
+      color: #fff;
+    }
+
+    /* QUESTION CARDS */
+    .quiz-list {
+      display: flex;
+      flex-direction: column;
+      gap: 22px;
+    }
+
+    .quiz-card {
+      background: var(--card-bg);
+      border: 3px solid var(--border);
+      box-shadow: var(--shadow);
+      border-radius: var(--radius);
+      padding: 22px;
+      transition: transform 0.2s ease;
+    }
+
+    .card-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 14px;
+    }
+
+    .q-number {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 1.1rem;
+      font-weight: 900;
+      color: var(--text);
+    }
+
+    .level-tag {
+      font-size: 0.75rem;
+      font-weight: 800;
+      padding: 4px 10px;
+      border-radius: 999px;
+      border: 2px solid var(--border);
+      box-shadow: 2px 2px 0 var(--border);
+      text-transform: uppercase;
+    }
+
+    .tag-nb { background: #bae6fd; } /* Xanh dương pastel */
+    .tag-th { background: #fef08a; } /* Vàng pastel */
+    .tag-vd { background: #fed7aa; } /* Cam pastel */
+    .tag-vdc { background: #e9d5ff; } /* Tím pastel */
+
+    .q-text {
+      font-size: 1.05rem;
+      font-weight: 700;
+      line-height: 1.5;
+      margin-bottom: 18px;
+    }
+
+    .options {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 10px;
+    }
+
+    @media (min-width: 640px) {
+      .options {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+
+    .opt-btn {
+      background: #f8fafc;
+      border: 2px solid var(--border);
+      box-shadow: 2px 2px 0 var(--border);
+      border-radius: 12px;
+      padding: 12px 14px;
+      text-align: left;
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: var(--text);
+      cursor: pointer;
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+      transition: all 0.12s ease;
+    }
+
+    .opt-btn:hover:not([disabled]) {
+      background: #f1f5f9;
+      transform: translate(-2px, -2px);
+      box-shadow: 4px 4px 0 var(--border);
+    }
+
+    .opt-btn:active:not([disabled]) {
+      transform: translate(1px, 1px);
+      box-shadow: 1px 1px 0 var(--border);
+    }
+
+    .opt-btn.correct {
+      background: var(--correct) !important;
+      font-weight: 900;
+    }
+
+    .opt-btn.wrong {
+      background: var(--wrong) !important;
+      color: #fff;
+    }
+
+    .opt-btn[disabled] {
+      cursor: default;
+    }
+
+    /* EXPLANATION BOX */
+    .explanation {
+      margin-top: 16px;
+      padding: 14px 16px;
+      background: #eff6ff;
+      border: 2px dashed var(--border);
+      border-radius: 12px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      line-height: 1.5;
+      display: none;
+    }
+
+    .explanation.show {
+      display: block;
+      animation: popIn 0.25s ease-out;
+    }
+
+    .explanation strong {
+      color: #1e3a8a;
+    }
+
+    @keyframes popIn {
+      0% { opacity: 0; transform: translateY(-6px); }
+      100% { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ACTION BAR */
+    .bottom-actions {
+      display: flex;
+      justify-content: center;
+      gap: 14px;
+      margin-top: 36px;
+      flex-wrap: wrap;
+    }
+
+    .action-btn {
+      background: var(--yellow);
+      border: 2.5px solid var(--border);
+      box-shadow: var(--shadow);
+      border-radius: 14px;
+      padding: 12px 24px;
+      font-size: 1rem;
+      font-weight: 800;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .action-btn:hover {
+      transform: translate(-2px, -2px);
+      box-shadow: var(--shadow-hover);
+    }
+
+    .action-btn.reset-btn {
+      background: var(--pink);
+      color: #fff;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <header>
+      <div class="badge-pill">🧪 Hóa Học 10 • KNTT ✨</div>
+      <h1>Bài 10: <span>Quy Tắc Octet</span></h1>
+      <p class="subtitle">Ôn tập chuẩn cấu trúc 4 mức độ • Tự tin bứt phá điểm số 🎯</p>
+    </header>
+
+    <!-- DASHBOARD TRẠNG THÁI -->
+    <div class="dashboard">
+      <div class="dash-stats">
+        <div class="stat-item">
+          <span>Tiến độ:</span>
+          <span class="stat-pill" id="progressText">0/20 câu</span>
+        </div>
+        <div class="stat-item">
+          <span>Đúng:</span>
+          <span class="stat-pill score" id="scoreText">0 câu (0đ)</span>
+        </div>
+        <div class="stat-item">
+          <span>Chính xác:</span>
+          <span class="stat-pill" id="accuracyText">0%</span>
+        </div>
+      </div>
+      <div class="progress-bar-container">
+        <div class="progress-bar-fill" id="progressBar"></div>
+      </div>
+    </div>
+
+    <!-- BỘ LỌC MỨC ĐỘ -->
+    <div class="filters">
+      <button class="filter-btn active" data-filter="all">Tất cả (20)</button>
+      <button class="filter-btn" data-filter="nb">🟢 Nhận biết (5)</button>
+      <button class="filter-btn" data-filter="th">🟡 Thông hiểu (6)</button>
+      <button class="filter-btn" data-filter="vd">🟠 Vận dụng (6)</button>
+      <button class="filter-btn" data-filter="vdc">🟣 Vận dụng cao (3)</button>
+    </div>
+
+    <!-- DANH SÁCH CÂU HỎI -->
+    <div class="quiz-list" id="quizContainer"></div>
+
+    <!-- NÚT ĐIỀU KHIỂN CHÂN TRANG -->
+    <div class="bottom-actions">
+      <button class="action-btn" id="showAllExplainBtn">💡 Mở toàn bộ lời giải</button>
+      <button class="action-btn reset-btn" id="resetBtn">🔄 Làm lại từ đầu</button>
+    </div>
+  </div>
+
+  <script>
+    // 20 CÂU HỎI BÀI 10 - QUY TẮC OCTET (KNTT)
+    const questions = [
+      // NHẬN BIẾT (1 - 5)
+      {
+        id: 1,
+        level: "nb",
+        levelText: "Nhận biết",
+        q: "Theo quy tắc octet, trong quá trình hình thành liên kết hoá học, nguyên tử của các nguyên tố nhóm A có xu hướng tạo thành lớp vỏ ngoài cùng có bao nhiêu electron (trừ helium)?",
+        options: ["8 electron.", "2 electron.", "18 electron.", "6 electron."],
+        correct: 0,
+        explain: "Quy tắc octet: Các nguyên tử có xu hướng nhường, nhận hoặc góp chung electron để đạt cấu hình electron bền vững gồm 8 electron ở lớp ngoài cùng (giống khí hiếm gần nhất)."
+      },
+      {
+        id: 2,
+        level: "nb",
+        levelText: "Nhận biết",
+        q: "Nguyên tử khí hiếm nào sau đây chỉ có 2 electron ở lớp vỏ ngoài cùng nhưng vẫn đạt cấu hình electron bền vững hoàn toàn?",
+        options: ["Neon (Ne).", "Helium (He).", "Argon (Ar).", "Krypton (Kr)."],
+        correct: 1,
+        explain: "Helium ($Z = 2$) chỉ có 1 lớp electron ($1s^2$) đã bão hòa với 2 electron, đây là ngoại lệ đạt cấu hình bền vững dạng 'duet'."
+      },
+      {
+        id: 3,
+        level: "nb",
+        levelText: "Nhận biết",
+        q: "Các nguyên tử kim loại kiềm (nhóm IA, có 1 electron ở lớp ngoài cùng) có xu hướng nào sau đây khi tham gia liên kết hoá học?",
+        options: ["Nhường 1 electron để tạo cation +1.", "Nhận 1 electron để tạo anion -1.", "Góp chung 7 electron với nguyên tử khác.", "Nhận 7 electron để đạt 8 electron."],
+        correct: 0,
+        explain: "Kim loại nhóm IA có 1e hóa trị, năng lượng ion hóa thấp nên dễ nhường 1e để đạt cấu hình octet của khí hiếm chu kì trước."
+      },
+      {
+        id: 4,
+        level: "nb",
+        levelText: "Nhận biết",
+        q: "Các nguyên tử phi kim nhóm Halogen (nhóm VIIA, có 7 electron ở lớp ngoài cùng) thường có xu hướng nào khi tạo liên kết ion?",
+        options: ["Nhận thêm 1 electron để tạo anion -1.", "Nhường đi 7 electron để tạo cation +7.", "Nhận thêm 2 electron để tạo anion -2.", "Nhường đi 1 electron để tạo cation +1."],
+        correct: 0,
+        explain: "Phi kim nhóm VIIA đã có 7e ở lớp ngoài cùng, có độ âm điện lớn nên có xu hướng thu thêm 1e để đạt cấu hình 8e bền vững."
+      },
+      {
+        id: 5,
+        level: "nb",
+        levelText: "Nhận biết",
+        q: "Khi một nguyên tử trung hoà nhận thêm electron, hạt vi mô tạo thành mang điện tích gì và được gọi là gì?",
+        options: ["Mang điện tích âm, gọi là anion.", "Mang điện tích dương, gọi là cation.", "Mang điện tích dương, gọi là anion.", "Mang điện tích âm, gọi là cation."],
+        correct: 0,
+        explain: "Nguyên tử trung hoà nhận thêm electron (mang điện tích âm) sẽ tích điện âm và được gọi là ion âm (anion)."
+      },
+
+      // THÔNG HIỂU (6 - 11)
+      {
+        id: 6,
+        level: "th",
+        levelText: "Thông hiểu",
+        q: "Nguyên tử Sodium (Na, Z = 11) nhường 1 electron để tạo thành ion Na⁺. Cấu hình electron của ion Na⁺ giống với cấu hình của khí hiếm nào?",
+        options: ["Helium (He, Z = 2).", "Neon (Ne, Z = 10).", "Argon (Ar, Z = 18).", "Krypton (Kr, Z = 36)."],
+        correct: 1,
+        explain: "Cấu hình của Na: 1s² 2s² 2p⁶ 3s¹. Khi nhường 1e, Na⁺ có cấu hình 1s² 2s² 2p⁶ (10e), hoàn toàn trùng với khí hiếm Neon."
+      },
+      {
+        id: 7,
+        level: "th",
+        levelText: "Thông hiểu",
+        q: "Nguyên tử Oxygen (O, Z = 8) nhận thêm 2 electron tạo thành anion Oxide (O²⁻). Cấu hình electron của ion O²⁻ là:",
+        options: ["1s² 2s² 2p⁶.", "1s² 2s² 2p⁴.", "1s² 2s² 2p².", "1s² 2s² 2p⁶ 3s²."],
+        correct: 0,
+        explain: "Nguyên tử O có cấu hình 1s² 2s² 2p⁴ (6e lớp ngoài). Khi nhận 2e tạo O²⁻, cấu hình trở thành 1s² 2s² 2p⁶ (8e ngoài cùng đạt octet)."
+      },
+      {
+        id: 8,
+        level: "th",
+        levelText: "Thông hiểu",
+        q: "Trong phân tử Cl₂, cả hai nguyên tử Chlorine (Z = 17) đạt được cấu hình octet bền vững bằng cách nào?",
+        options: ["Mỗi nguyên tử Clo nhường và nhận 1 electron cho nhau.", "Hai nguyên tử Clo góp chung 1 cặp electron.", "Mỗi nguyên tử Clo góp chung 2 electron để tạo 2 cặp e.", "Một nguyên tử Clo nhường hoàn toàn 1 electron cho nguyên tử kia."],
+        correct: 1,
+        explain: "Mỗi nguyên tử Cl có 7e lớp ngoài cùng. Chúng góp chung 1e tạo thành 1 cặp electron dùng chung (liên kết đơn Cl-Cl), giúp cả 2 đều có 8e."
+      },
+      {
+        id: 9,
+        level: "th",
+        levelText: "Thông hiểu",
+        q: "Sơ đồ nào sau đây biểu diễn đúng quá trình hình thành ion từ nguyên tử Magnesium (Mg, Z = 12)?",
+        options: ["Mg + 2e → Mg²⁻.", "Mg → Mg²⁺ + 2e.", "Mg → Mg⁺ + 1e.", "Mg + 1e → Mg⁻."],
+        correct: 1,
+        explain: "Magnesium là kim loại nhóm IIA có 2e lớp ngoài cùng (3s²). Mg dễ dàng nhường 2e để tạo cation Mg²⁺: Mg → Mg²⁺ + 2e."
+      },
+      {
+        id: 10,
+        level: "th",
+        levelText: "Thông hiểu",
+        q: "Trong phân tử nước (H₂O), để thỏa mãn quy tắc octet/duet, nguyên tử O và các nguyên tử H đã:",
+        options: ["O góp chung với mỗi nguyên tử H 1 cặp electron (tổng cộng 2 cặp dùng chung).", "O nhường 2 electron cho 2 nguyên tử H.", "Mỗi nguyên tử H nhường 1 electron cho nguyên tử O.", "O góp chung 4 electron với 1 nguyên tử H."],
+        correct: 0,
+        explain: "O góp 1e với mỗi H để tạo liên kết cộng hóa trị O-H. Quanh O có 8e (4e liên kết + 4e chưa liên kết), quanh mỗi H có 2e (đạt duet bền vững)."
+      },
+      {
+        id: 11,
+        level: "th",
+        levelText: "Thông hiểu",
+        q: "Ion nhôm Al³⁺ (biết Al có số hiệu nguyên tử Z = 13) có tổng số electron là bao nhiêu?",
+        options: ["10 electron.", "13 electron.", "16 electron.", "8 electron."],
+        correct: 0,
+        explain: "Số electron trong ion Al³⁺ = Z - 3 = 13 - 3 = 10 electron (cấu hình 1s² 2s² 2p⁶, tương tự khí hiếm Ne)."
+      },
+
+      // VẬN DỤNG (12 - 17)
+      {
+        id: 12,
+        level: "vd",
+        levelText: "Vận dụng",
+        q: "Cho hai nguyên tố X (Z = 11) và Y (Z = 8). Dựa vào quy tắc octet, công thức của hợp chất tạo thành giữa X và Y là:",
+        options: ["XY.", "X₂Y.", "XY₂.", "X₂Y₃."],
+        correct: 1,
+        explain: "X là Na (nhường 1e → X⁺), Y là O (nhận 2e → Y²⁻). Để trung hòa điện tích: 2X⁺ + Y²⁻ → X₂Y (chính là Na₂O)."
+      },
+      {
+        id: 13,
+        level: "vd",
+        levelText: "Vận dụng",
+        q: "Trong phân tử khí Carbon dioxide (CO₂), để cả nguyên tử C (Z = 6) và O (Z = 8) cùng đạt cấu hình octet, liên kết giữa nguyên tử C và mỗi nguyên tử O là:",
+        options: ["Liên kết đơn.", "Liên kết đôi.", "Liên kết ba.", "Liên kết ion."],
+        correct: 1,
+        explain: "Công thức Lewis là O=C=O. Nguyên tử C góp 2 electron với mỗi nguyên tử O, hình thành 2 liên kết đôi giúp C và hai O đều có đủ 8e."
+      },
+      {
+        id: 14,
+        level: "vd",
+        levelText: "Vận dụng",
+        q: "Trong phân tử Amoniac (NH₃), sau khi hình thành 3 liên kết N-H, xung quanh nguyên tử Nitrogen (Z = 7) còn lại bao nhiêu electron hoá trị chưa tham gia liên kết?",
+        options: ["0 electron.", "1 electron.", "2 electron (1 cặp electron tự do).", "4 electron (2 cặp electron tự do)."],
+        correct: 2,
+        explain: "N có 5 electron lớp ngoài cùng. Dùng 3 electron để liên kết với 3 nguyên tử H, còn lại 5 - 3 = 2 electron (tức 1 cặp e tự do chưa liên kết)."
+      },
+      {
+        id: 15,
+        level: "vd",
+        levelText: "Vận dụng",
+        q: "Nguyên tố R thuộc chu kì 3, nhóm VIA của bảng tuần hoàn. Để đạt cấu hình electron bền vững của khí hiếm Argon (Ar), nguyên tử R có xu hướng:",
+        options: ["Nhận thêm 2 electron tạo ion R²⁻.", "Nhường đi 6 electron tạo ion R⁶⁺.", "Nhận thêm 6 electron tạo ion R⁶⁻.", "Nhường đi 2 electron tạo ion R²⁺."],
+        correct: 0,
+        explain: "Nhóm VIA có 6e lớp ngoài cùng (3s² 3p⁴). Để đạt octet giống Argon (3s² 3p⁶), R nhận thêm 2 electron tạo ion R²⁻ (như Sulfur tạo S²⁻)."
+      },
+      {
+        id: 16,
+        level: "vd",
+        levelText: "Vận dụng",
+        q: "Ion M²⁺ có cấu hình electron ở phân lớp ngoài cùng là 2p⁶. Vị trí của nguyên tố M trong bảng tuần hoàn hoá học là:",
+        options: ["Chu kì 2, nhóm VIIIA.", "Chu kì 3, nhóm IIA.", "Chu kì 3, nhóm VIA.", "Chu kì 4, nhóm IIA."],
+        correct: 1,
+        explain: "Ion M²⁺ có cấu hình: 1s² 2s² 2p⁶ (10e). Do đó nguyên tử trung hòa M có 10 + 2 = 12 electron (1s² 2s² 2p⁶ 3s²). M ở chu kì 3, nhóm IIA (Magnesium)."
+      },
+      {
+        id: 17,
+        level: "vd",
+        levelText: "Vận dụng",
+        q: "Phân tử Nitrogen (N₂) có cấu tạo rất bền vững ở nhiệt độ thường. Để thỏa mãn quy tắc octet, hai nguyên tử N liên kết với nhau bằng bao nhiêu cặp electron dùng chung?",
+        options: ["1 cặp (liên kết đơn).", "2 cặp (liên kết đôi).", "3 cặp (liên kết ba).", "4 cặp electron."],
+        correct: 2,
+        explain: "Mỗi nguyên tử N có 5e lớp ngoài cùng, cần thêm 3e. Hai nguyên tử N góp chung 3 cặp electron tạo thành liên kết ba (N≡N) vô cùng bền vững."
+      },
+
+      // VẬN DỤNG CAO (18 - 20)
+      {
+        id: 18,
+        level: "vdc",
+        levelText: "Vận dụng cao",
+        q: "Trường hợp nào sau đây là ngoại lệ của quy tắc octet do nguyên tử trung tâm 'chưa đủ 8 electron' (thiếu octet)?",
+        options: ["BF₃ (Boron trifluoride).", "CH₄ (Methane).", "CCl₄ (Carbon tetrachloride).", "H₂O (Nước)."],
+        correct: 0,
+        explain: "Trong phân tử BF₃, nguyên tử Boron (B) chỉ có 3 electron hóa trị và tạo 3 liên kết đơn với 3 nguyên tử F, xung quanh B chỉ có 6 electron (chưa đủ 8e)."
+      },
+      {
+        id: 19,
+        level: "vdc",
+        levelText: "Vận dụng cao",
+        q: "Phân tử nào sau đây là ví dụ điển hình về sự 'mở rộng octet' (nguyên tử trung tâm có nhiều hơn 8 electron lớp ngoài cùng)?",
+        options: ["SF₆ (Sulfur hexafluoride).", "CH₄ (Methane).", "CO₂ (Carbon dioxide).", "NH₃ (Ammonia)."],
+        correct: 0,
+        explain: "Trong SF₆, nguyên tử Sulfur (S) tạo 6 liên kết đơn với 6 nguyên tử Flo, xung quanh S có tới 12 electron hoá trị (sử dụng thêm phân lớp d trống để mở rộng octet)."
+      },
+      {
+        id: 20,
+        level: "vdc",
+        levelText: "Vận dụng cao",
+        q: "Phân tử Nitrogen dioxide (NO₂) không tuân theo quy tắc octet tiêu chuẩn vì nguyên nhân chính nào sau đây?",
+        options: ["Tổng số electron hóa trị của cả phân tử là một số lẻ (17 electron).", "Nguyên tử Nitơ không có khả năng liên kết với Oxi.", "Nguyên tử Oxi không đạt được cấu hình khí hiếm.", "Phân tử có dạng hình học thẳng hàng đối xứng."],
+        correct: 0,
+        explain: "N có 5e hóa trị, mỗi O có 6e hóa trị. Tổng số electron hóa trị trong NO₂ = 5 + 6×2 = 17 (số lẻ). Do đó phân tử bắt buộc phải chứa 1 electron độc thân, không thể đồng thời thỏa mãn octet cho tất cả nguyên tử."
+      }
+    ];
+
+    // TRẠNG THÁI APP
+    let userAnswers = {}; // { qId: selectedOptionIndex }
+    let currentFilter = 'all';
+
+    const quizContainer = document.getElementById('quizContainer');
+    const progressText = document.getElementById('progressText');
+    const scoreText = document.getElementById('scoreText');
+    const accuracyText = document.getElementById('accuracyText');
+    const progressBar = document.getElementById('progressBar');
+    const filterButtons = document.querySelectorAll('.filter-btn');
+    const resetBtn = document.getElementById('resetBtn');
+    const showAllExplainBtn = document.getElementById('showAllExplainBtn');
+
+    // TẠO GIAO DIỆN CÂU HỎI
+    function renderQuiz() {
+      quizContainer.innerHTML = '';
+
+      const filteredQuestions = questions.filter(q => {
+        if (currentFilter === 'all') return true;
+        return q.level === currentFilter;
+      });
+
+      filteredQuestions.forEach((item) => {
+        const isAnswered = userAnswers[item.id] !== undefined;
+        const selectedOpt = userAnswers[item.id];
+
+        const card = document.createElement('div');
+        card.className = 'quiz-card';
+        card.dataset.id = item.id;
+
+        const optionsHtml = item.options.map((opt, idx) => {
+          let btnClass = 'opt-btn';
+          if (isAnswered) {
+            if (idx === item.correct) btnClass += ' correct';
+            else if (idx === selectedOpt) btnClass += ' wrong';
+          }
+          const letters = ['A', 'B', 'C', 'D'];
+          return `
+            <button class="${btnClass}" ${isAnswered ? 'disabled' : ''} onclick="selectAnswer(${item.id}, ${idx})">
+              <span><strong>${letters[idx]}.</strong></span>
+              <span>${opt}</span>
+            </button>
+          `;
+        }).join('');
+
+        const explainClass = isAnswered ? 'explanation show' : 'explanation';
+
+        card.innerHTML = `
+          <div class="card-top">
+            <span class="q-number">Câu ${item.id}</span>
+            <span class="level-tag tag-${item.level}">${item.levelText}</span>
+          </div>
+          <div class="q-text">${item.q}</div>
+          <div class="options">${optionsHtml}</div>
+          <div class="${explainClass}" id="explain-${item.id}">
+            <strong>💡 Giải thích chi tiết:</strong> ${item.explain}
+          </div>
+        `;
+
+        quizContainer.appendChild(card);
+      });
+
+      updateStats();
+    }
+
+    // CHỌN ĐÁP ÁN
+    window.selectAnswer = function(qId, optIdx) {
+      if (userAnswers[qId] !== undefined) return;
+
+      userAnswers[qId] = optIdx;
+      const question = questions.find(q => q.id === qId);
+
+      // Hiệu ứng pháo giấy mini nếu đúng
+      if (optIdx === question.correct && typeof confetti === 'function') {
+        confetti({
+          particleCount: 25,
+          spread: 45,
+          origin: { y: 0.85 }
+        });
+      }
+
+      renderQuiz();
+
+      // Kiểm tra nếu làm xong cả 20 câu
+      if (Object.keys(userAnswers).length === questions.length) {
+        triggerFinishCelebration();
+      }
+    };
+
+    // CẬP NHẬT THỐNG KÊ
+    function updateStats() {
+      const answeredCount = Object.keys(userAnswers).length;
+      let correctCount = 0;
+
+      questions.forEach(q => {
+        if (userAnswers[q.id] === q.correct) {
+          correctCount++;
+        }
+      });
+
+      const accuracy = answeredCount > 0 ? Math.round((correctCount / answeredCount) * 100) : 0;
+      const progressPercent = Math.round((answeredCount / questions.length) * 100);
+
+      progressText.textContent = `${answeredCount}/${questions.length} câu`;
+      scoreText.textContent = `${correctCount} câu (${(correctCount * 0.5).toFixed(1)}đ)`;
+      accuracyText.textContent = `${accuracy}%`;
+      progressBar.style.width = `${progressPercent}%`;
+    }
+
+    // HIỆU ỨNG KHI HOÀN THÀNH
+    function triggerFinishCelebration() {
+      let correctCount = 0;
+      questions.forEach(q => {
+        if (userAnswers[q.id] === q.correct) correctCount++;
+      });
+
+      if (typeof confetti === 'function') {
+        confetti({
+          particleCount: 120,
+          spread: 80,
+          origin: { y: 0.6 }
+        });
+      }
+
+      setTimeout(() => {
+        alert(`🎉 Xuất sắc! Bạn đã hoàn thành 20 câu!\n\nĐiểm số: ${(correctCount * 0.5).toFixed(1)} / 10 điểm (${correctCount}/${questions.length} câu đúng).`);
+      }, 350);
+    }
+
+    // BỘ LỌC
+    filterButtons.forEach(btn => {
+      btn.addEventListener('click', () => {
+        filterButtons.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        currentFilter = btn.dataset.filter;
+        renderQuiz();
+      });
+    });
+
+    // MỞ TOÀN BỘ GIẢI THÍCH
+    let allExplained = false;
+    showAllExplainBtn.addEventListener('click', () => {
+      allExplained = !allExplained;
+      document.querySelectorAll('.explanation').forEach(el => {
+        if (allExplained) el.classList.add('show');
+        else {
+          const card = el.closest('.quiz-card');
+          const id = parseInt(card.dataset.id);
+          if (userAnswers[id] === undefined) el.classList.remove('show');
+        }
+      });
+      showAllExplainBtn.textContent = allExplained ? '🙈 Ẩn bớt giải thích' : '💡 Mở toàn bộ lời giải';
+    });
+
+    // RESET LÀM LẠI
+    resetBtn.addEventListener('click', () => {
+      if (confirm('Bạn có muốn làm lại bộ câu hỏi từ đầu không?')) {
+        userAnswers = {};
+        allExplained = false;
+        showAllExplainBtn.textContent = '💡 Mở toàn bộ lời giải';
+        renderQuiz();
+      }
+    });
+
+    // KHỞI CHẠY LẦN ĐẦU
+    renderQuiz();
+  </script>
+</body>
+</html>
